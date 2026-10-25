@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f8f7f3">
+    <meta name="description" content="Discover Sarajevo's local restaurants and order your favourites with EasyBites.">
+    <title>EasyBites — Sarajevo, served.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#home" aria-label="EasyBites home">
+          <span class="brand-mark" aria-hidden="true">e</span>
+          <span>easy<span class="brand-accent">bites</span></span>
+        </a>
+        <button class="mobile-menu-button" id="menu-toggle" aria-label="Open navigation" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="main-nav" id="main-nav" aria-label="Main navigation">
+          <a class="nav-link active" href="#home" data-page="home">Discover</a>
+          <a class="nav-link" href="#orders" data-page="orders">My orders</a>
+          <a class="nav-link" href="#profile" data-page="profile">Profile</a>
+        </nav>
+        <div class="topbar-actions">
+          <button class="location-button" type="button" aria-label="Delivery location">
+            <span class="location-pin" aria-hidden="true">⌖</span>
+            <span><small>Delivering to</small><strong>Sarajevo, BiH</strong></span>
+            <span class="chevron" aria-hidden="true">⌄</span>
+          </button>
+          <a class="cart-button" href="#cart" aria-label="Open basket">
+            <span aria-hidden="true">♧</span><span class="cart-label">Basket</span><span class="cart-count" id="cart-count">0</span>
+          </a>
+          <a class="avatar-button" href="#profile" aria-label="Your profile">M</a>
+        </div>
+      </header>
+
+      <main>
+        <section class="page active" id="page-home" aria-labelledby="hero-title">
+          <div class="hero">
+            <div class="hero-copy">
+              <div class="eyebrow"><span class="eyebrow-dot"></span> YOUR NEIGHBOURHOOD, DELIVERED</div>
+              <h1 id="hero-title">Sarajevo,<br>served <span>your way.</span></h1>
+              <p class="hero-description">The city's best bites, from the ćevabdžinica around the corner to your all-time favourite pizza spot.</p>
+              <form class="search-form" id="search-form" role="search">
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <label class="sr-only" for="restaurant-search">Search restaurants or dishes</label>
+                <input id="restaurant-search" type="search" placeholder="Search restaurants or dishes">
+                <button type="submit">Find food</button>
+              </form>
+              <div class="hero-note"><span aria-hidden="true">✦</span> Made for Sarajevo. Delivered with love.</div>
+            </div>
+            <div class="hero-art" aria-label="Illustration of a Sarajevo meal">
+              <div class="hero-sun"></div>
+              <div class="hero-label"><span>✳</span> LOCAL FAVOURITE</div>
+              <div class="food-plate"><span class="plate-food">🥙</span></div>
+              <div class="hero-sticker"><span>Baš<br>dobro!</span><span class="sticker-star">✳</span></div>
+              <span class="art-sparkle sparkle-one">✳</span><span class="art-sparkle sparkle-two">✦</span>
+              <span class="art-leaf leaf-one">⌁</span><span class="art-leaf leaf-two">⌁</span>
+              <div class="hero-caption"><span class="caption-icon">♡</span><span><strong>Good food, good mood.</strong><small>Right here in Sarajevo.</small></span></div>
+            </div>
+          </div>
+
+          <div class="content-wrap">
+            <section class="category-section" aria-labelledby="category-title">
+              <div class="section-heading compact-heading">
+                <div><span class="section-kicker">WHAT ARE YOU CRAVING?</span><h2 id="category-title">Pick your mood</h2></div>
+                <button class="text-button" type="button" id="clear-category">See all <span aria-hidden="true">→</span></button>
+              </div>
+              <div class="categories" id="categories">
+                <button class="category-chip selected" type="button" data-category="All"><span>🍽️</span> All food</button>
+                <button class="category-chip" type="button" data-category="Local"><span>🥙</span> Local classics</button>
+                <button class="category-chip" type="button" data-category="Pizza"><span>🍕</span> Pizza</button>
+                <button class="category-chip" type="button" data-category="Burgers"><span>🍔</span> Burgers</button>
+                <button class="category-chip" type="button" data-category="Healthy"><span>🥗</span> Fresh &amp; healthy</button>
+                <button class="category-chip" type="button" data-category="Dessert"><span>🍰</span> Something sweet</button>
+              </div>
+            </section>
+
+            <section class="restaurant-section" aria-labelledby="restaurant-title">
+              <div class="section-heading">
+                <div><span class="section-kicker">GOOD THINGS ARE CLOSE</span><h2 id="restaurant-title">Around your corner <span class="heading-sparkle">✳</span></h2></div>
+                <button class="text-button" type="button" id="show-all">All restaurants <span aria-hidden="true">→</span></button>
+              </div>
+              <div class="restaurant-grid" id="restaurant-grid"></div>
+              <div class="empty-state hidden" id="empty-restaurants">
+                <span>🍽️</span><h3>No bites found just yet</h3><p>Try another search or pick a different craving.</p>
+              </div>
+              <p class="demo-note">Restaurant listings are sample content for this static project preview.</p>
+            </section>
+
+            <section class="local-banner">
+              <div class="banner-icon" aria-hidden="true">♡</div>
+              <div><span class="section-kicker">A LITTLE LOVE GOES A LONG WAY</span><h2>Every order supports local.</h2><p>Discover the neighbourhood spots that make Sarajevo taste like home.</p></div>
+              <span class="banner-decoration" aria-hidden="true">✳</span>
+            </section>
+          </div>
+        </section>
+
+        <section class="page content-page" id="page-restaurant" aria-labelledby="restaurant-detail-title">
+          <div class="content-wrap">
+            <button class="back-button" type="button" data-page-link="home">← Back to Discover</button>
+            <div id="restaurant-detail"></div>
+          </div>
+        </section>
+
+        <section class="page content-page" id="page-cart" aria-labelledby="cart-title">
+          <div class="content-wrap narrow-wrap">
+            <span class="section-kicker">GOOD CHOICE</span><h1 class="page-title" id="cart-title">Your basket</h1>
+            <div id="cart-content"></div>
+          </div>
+        </section>
+
+        <section class="page content-page" id="page-orders" aria-labelledby="orders-title">
+          <div class="content-wrap narrow-wrap">
+            <span class="section-kicker">THE GOOD STUFF, RECAP</span><h1 class="page-title" id="orders-title">My orders</h1>
+            <div class="order-card">
+              <div class="order-emoji">🥙</div><div class="order-details"><span class="order-status"><i></i> On its way</span><h2>Baščaršija Bites</h2><p>1× Sarajevo ćevapi · 1× Ayran</p><small>Today · 14:32 · Sample order</small></div><strong class="order-total">KM 15.00</strong>
+            </div>
+            <div class="delivery-progress"><div class="progress-line"><span></span></div><div class="progress-steps"><span class="done">Order placed</span><span class="done">Preparing</span><span class="current">On its way</span><span>Delivered</span></div></div>
+            <p class="demo-note">This order is a demonstration and is not connected to a delivery service.</p>
+          </div>
+        </section>
+
+        <section class="page content-page" id="page-profile" aria-labelledby="profile-title">
+          <div class="content-wrap narrow-wrap">
+            <span class="section-kicker">YOUR EASYBITES</span><h1 class="page-title" id="profile-title">Your profile</h1>
+            <div class="profile-card"><div class="profile-avatar">M</div><div><h2>Welcome, neighbour!</h2><p>Sign in to save your details and find your favourites.</p></div><button class="primary-button" type="button" data-page-link="auth">Sign in</button></div>
+            <div class="profile-links"><button type="button" data-page-link="orders"><span>◷</span> Order history <span>→</span></button><button type="button" data-page-link="auth"><span>♡</span> Saved favourites <span>→</span></button><button type="button" data-page-link="auth"><span>⌖</span> Delivery addresses <span>→</span></button></div>
+            <div class="role-preview"><div><span class="section-kicker">FOR PROJECT REVIEW</span><h2>Admin role preview</h2><p>Explore the management screens planned for the admin role. This is a static preview, not a login.</p></div><button class="primary-button" type="button" data-page-link="admin">Open admin workspace <span>→</span></button></div>
+          </div>
+        </section>
+
+        <section class="page content-page admin-page" id="page-admin" aria-labelledby="admin-title">
+          <div class="content-wrap">
+            <div class="admin-heading">
+              <div><span class="section-kicker">EASYBITES MANAGEMENT</span><h1 id="admin-title">Admin workspace</h1><p>Keep the neighbourhood's food scene running smoothly.</p></div>
+              <span class="demo-role-badge"><span></span> Admin role · Preview</span>
+            </div>
+            <div class="admin-tabs" role="tablist" aria-label="Admin sections">
+            <button class="selected" id="admin-tab-overview" type="button" role="tab" aria-selected="true" aria-controls="admin-panel-overview" tabindex="0" data-admin-view="overview">Overview</button>
+            <button id="admin-tab-restaurants" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-restaurants" tabindex="-1" data-admin-view="restaurants">Restaurants</button>
+            <button id="admin-tab-menu-items" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-menu-items" tabindex="-1" data-admin-view="menu-items">Menu items</button>
+            <button id="admin-tab-orders" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-orders" tabindex="-1" data-admin-view="orders">Orders</button>
+            <button id="admin-tab-users" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-users" tabindex="-1" data-admin-view="users">Users</button>
+            <button id="admin-tab-reviews" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-reviews" tabindex="-1" data-admin-view="reviews">Reviews</button>
+            </div>
+            <div class="admin-demo-banner"><span>ⓘ</span><p><strong>Static admin preview.</strong> These are example records and controls. No changes are saved.</p></div>
+
+            <section class="admin-view active" id="admin-panel-overview" role="tabpanel" aria-labelledby="admin-tab-overview" tabindex="0" data-admin-panel="overview">
+              <div class="admin-stat-grid">
+                <article class="admin-stat"><span>ACTIVE RESTAURANTS</span><strong>24</strong><small>Across Sarajevo</small><i>🍽️</i></article>
+                <article class="admin-stat"><span>ORDERS TODAY</span><strong>186</strong><small class="stat-up">↑ 12% from yesterday</small><i>🛍️</i></article>
+                <article class="admin-stat"><span>REGISTERED CUSTOMERS</span><strong>1,248</strong><small>Customer accounts</small><i>👋</i></article>
+                <article class="admin-stat"><span>REVIEWS TO CHECK</span><strong>3</strong><small>Awaiting moderation</small><i>⭐</i></article>
+              </div>
+              <div class="admin-overview-grid">
+                <article class="admin-panel"><div class="admin-panel-heading"><div><span class="section-kicker">LATEST ACTIVITY</span><h2>Recent orders</h2></div><button type="button" class="text-button" data-admin-view="orders">All orders →</button></div>
+                  <div class="activity-row"><span class="activity-icon">🥙</span><span><strong>#EB-1048 · Baščaršija Bites</strong><small>Amira H. · 2 items</small></span><b>Preparing</b></div>
+                  <div class="activity-row"><span class="activity-icon">🍕</span><span><strong>#EB-1047 · Slice of Sarajevo</strong><small>Emir K. · 3 items</small></span><b class="status-delivery">On its way</b></div>
+                  <div class="activity-row"><span class="activity-icon">🍔</span><span><strong>#EB-1046 · Mali Burger</strong><small>Lejla S. · 1 item</small></span><b class="status-delivered">Delivered</b></div>
+                </article>
+                <article class="admin-panel local-insight"><span class="section-kicker">SARAJEVO SPOTLIGHT</span><h2>Local love is growing.</h2><p>More neighbourhood favourites, one good meal at a time.</p><div class="insight-decoration">✳</div><button type="button" class="text-button" data-admin-view="restaurants">Manage restaurants →</button></article>
+              </div>
+            </section>
+
+            <section class="admin-view" id="admin-panel-restaurants" role="tabpanel" aria-labelledby="admin-tab-restaurants" tabindex="0" data-admin-panel="restaurants">
+              <div class="admin-panel-heading entity-heading"><div><span class="section-kicker">PARTNER DIRECTORY</span><h2>Restaurants <span class="entity-count">6 examples</span></h2></div><button class="primary-button admin-action" type="button" data-admin-action="add" data-entity="restaurant">+ Add restaurant</button></div>
+              <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>RESTAURANT</th><th>CUISINE</th><th>LOCATION</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody>
+                <tr><td><strong>Baščaršija Bites</strong><small>partner@bascarsija.example</small></td><td>Bosnian</td><td>Baščaršija</td><td><span class="table-status active-status">Active</span></td><td><button class="table-action" data-admin-action="edit" data-entity="restaurant">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="restaurant">Delete</button></td></tr>
+                <tr><td><strong>Zelena Bašta</strong><small>hello@zelenabasta.example</small></td><td>Fresh &amp; healthy</td><td>Centar</td><td><span class="table-status active-status">Active</span></td><td><button class="table-action" data-admin-action="edit" data-entity="restaurant">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="restaurant">Delete</button></td></tr>
+                <tr><td><strong>Slice of Sarajevo</strong><small>ciao@slice.example</small></td><td>Italian</td><td>Marijin Dvor</td><td><span class="table-status active-status">Active</span></td><td><button class="table-action" data-admin-action="edit" data-entity="restaurant">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="restaurant">Delete</button></td></tr>
+                <tr><td><strong>Mali Burger</strong><small>hello@maliburger.example</small></td><td>Burgers</td><td>Grbavica</td><td><span class="table-status paused-status">Paused</span></td><td><button class="table-action" data-admin-action="edit" data-entity="restaurant">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="restaurant">Delete</button></td></tr>
+              </tbody></table></div>
+            </section>
+
+            <section class="admin-view" id="admin-panel-menu-items" role="tabpanel" aria-labelledby="admin-tab-menu-items" tabindex="0" data-admin-panel="menu-items">
+              <div class="admin-panel-heading entity-heading"><div><span class="section-kicker">WHAT'S ON THE MENU</span><h2>Menu items <span class="entity-count">Sample catalogue</span></h2></div><button class="primary-button admin-action" type="button" data-admin-action="add" data-entity="menu item">+ Add menu item</button></div>
+              <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ITEM</th><th>RESTAURANT</th><th>PRICE</th><th>AVAILABILITY</th><th>ACTIONS</th></tr></thead><tbody>
+                <tr><td><strong>Sarajevo ćevapi</strong><small>Grilled ćevapi, somun &amp; kajmak</small></td><td>Baščaršija Bites</td><td>KM 12.50</td><td><span class="table-status active-status">Available</span></td><td><button class="table-action" data-admin-action="edit" data-entity="menu item">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="menu item">Delete</button></td></tr>
+                <tr><td><strong>Garden bowl</strong><small>Seasonal greens and roasted vegetables</small></td><td>Zelena Bašta</td><td>KM 11.00</td><td><span class="table-status active-status">Available</span></td><td><button class="table-action" data-admin-action="edit" data-entity="menu item">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="menu item">Delete</button></td></tr>
+                <tr><td><strong>Margherita</strong><small>Tomato, mozzarella &amp; basil</small></td><td>Slice of Sarajevo</td><td>KM 12.00</td><td><span class="table-status paused-status">Unavailable</span></td><td><button class="table-action" data-admin-action="edit" data-entity="menu item">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="menu item">Delete</button></td></tr>
+              </tbody></table></div>
+            </section>
+
+            <section class="admin-view" id="admin-panel-orders" role="tabpanel" aria-labelledby="admin-tab-orders" tabindex="0" data-admin-panel="orders">
+              <div class="admin-panel-heading entity-heading"><div><span class="section-kicker">FULFILMENT QUEUE</span><h2>Orders <span class="entity-count">Today's examples</span></h2></div><span class="table-status active-status">3 in progress</span></div>
+              <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>ORDER</th><th>CUSTOMER</th><th>RESTAURANT</th><th>TOTAL</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody>
+                <tr><td><strong>#EB-1048</strong><small>Today · 14:38</small></td><td>Amira Hadžić</td><td>Baščaršija Bites<small>Ćevapi ×1, Ayran ×1</small></td><td>KM 15.00</td><td><span class="table-status preparing-status">Preparing</span></td><td><button class="table-action" data-admin-action="edit" data-entity="order">Update</button></td></tr>
+                <tr><td><strong>#EB-1047</strong><small>Today · 14:32</small></td><td>Emir Kovač</td><td>Slice of Sarajevo<small>Pizza ×2, Garlic knots ×1</small></td><td>KM 34.00</td><td><span class="table-status delivery-status">On its way</span></td><td><button class="table-action" data-admin-action="edit" data-entity="order">Update</button></td></tr>
+                <tr><td><strong>#EB-1046</strong><small>Today · 14:20</small></td><td>Lejla Selimović</td><td>Mali Burger<small>The Mali ×1</small></td><td>KM 14.50</td><td><span class="table-status active-status">Delivered</span></td><td><button class="table-action" data-admin-action="edit" data-entity="order">View</button></td></tr>
+              </tbody></table></div>
+              <p class="demo-note">Order items are shown within each order; each line represents the planned OrderItems relationship.</p>
+            </section>
+
+            <section class="admin-view" id="admin-panel-users" role="tabpanel" aria-labelledby="admin-tab-users" tabindex="0" data-admin-panel="users">
+              <div class="admin-panel-heading entity-heading"><div><span class="section-kicker">COMMUNITY DIRECTORY</span><h2>Users <span class="entity-count">Customer &amp; admin roles</span></h2></div><button class="primary-button admin-action" type="button" data-admin-action="add" data-entity="user">+ Add user</button></div>
+              <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>USER</th><th>EMAIL</th><th>ROLE</th><th>JOINED</th><th>ACTIONS</th></tr></thead><tbody>
+                <tr><td><strong>Amira Hadžić</strong><small>Customer ID 1042</small></td><td>amira@example.test</td><td><span class="table-status customer-role">Customer</span></td><td>Oct 20, 2026</td><td><button class="table-action" data-admin-action="edit" data-entity="user">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="user">Delete</button></td></tr>
+                <tr><td><strong>Emir Kovač</strong><small>Customer ID 1041</small></td><td>emir@example.test</td><td><span class="table-status customer-role">Customer</span></td><td>Oct 19, 2026</td><td><button class="table-action" data-admin-action="edit" data-entity="user">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="user">Delete</button></td></tr>
+                <tr><td><strong>EasyBites Admin</strong><small>Administrator ID 1</small></td><td>admin@example.test</td><td><span class="table-status admin-role">Admin</span></td><td>Sep 01, 2026</td><td><button class="table-action" data-admin-action="edit" data-entity="user">Edit</button><button class="table-action danger-action" data-admin-action="delete" data-entity="user">Delete</button></td></tr>
+              </tbody></table></div>
+            </section>
+
+            <section class="admin-view" id="admin-panel-reviews" role="tabpanel" aria-labelledby="admin-tab-reviews" tabindex="0" data-admin-panel="reviews">
+              <div class="admin-panel-heading entity-heading"><div><span class="section-kicker">CUSTOMER FEEDBACK</span><h2>Reviews <span class="entity-count">Moderation preview</span></h2></div><span class="table-status paused-status">3 need a look</span></div>
+              <div class="review-list">
+                <article class="review-item"><div class="review-topline"><strong>Amira H. <span>★ ★ ★ ★ ★</span></strong><small>Baščaršija Bites · Today</small></div><p>Still thinking about those ćevapi. Lovely food and quick delivery!</p><div><button class="table-action" data-admin-action="edit" data-entity="review">Keep review</button><button class="table-action danger-action" data-admin-action="delete" data-entity="review">Remove</button></div></article>
+                <article class="review-item"><div class="review-topline"><strong>Emir K. <span>★ ★ ★ ★ ☆</span></strong><small>Slice of Sarajevo · Yesterday</small></div><p>Great crust and generous toppings. Will definitely order again.</p><div><button class="table-action" data-admin-action="edit" data-entity="review">Keep review</button><button class="table-action danger-action" data-admin-action="delete" data-entity="review">Remove</button></div></article>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="page content-page" id="page-auth" aria-labelledby="auth-title">
+          <div class="auth-card">
+            <a class="brand auth-brand" href="#home"><span class="brand-mark">e</span><span>easy<span class="brand-accent">bites</span></span></a>
+            <span class="section-kicker">A SEAT AT OUR TABLE</span><h1 id="auth-title">Welcome back.</h1><p class="auth-intro">Sign in to get a little closer to your local favourites.</p>
+            <div class="auth-tabs"><button class="selected" type="button" data-auth-mode="login">Sign in</button><button type="button" data-auth-mode="register">Create account</button></div>
+            <form id="auth-form">
+              <div class="register-name-field hidden"><label for="auth-name">Your name</label><input id="auth-name" type="text" autocomplete="name" placeholder="First and last name"></div>
+              <label for="auth-email">Email address</label><input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+              <label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required minlength="8">
+              <button class="primary-button auth-submit" type="submit">Sign in <span>→</span></button>
+            </form>
+            <p class="auth-demo-note">Demo screen only. No account will be created or signed in.</p>
+            <button class="auth-back" type="button" data-page-link="home">← Back to discovering</button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer"><a class="brand footer-brand" href="#home"><span class="brand-mark">e</span><span>easy<span class="brand-accent">bites</span></span></a><span>Made with a little extra love in Sarajevo <span class="footer-heart">♥</span></span><span>Student project · Demo preview</span></footer>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+  </body>
+</html>
