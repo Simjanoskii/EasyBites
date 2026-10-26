@@ -1,0 +1,18 @@
+# Local configuration and secrets
+/backend/config/config.php
+/backend/config/*.local.php
+.env
+.env.*
+!.env.example
+
+# Runtime logs
+/backend/logs/*
+!/backend/logs/.gitkeep
+
+# PHP dependencies
+/backend/vendor/
+
+# Editor and operating-system files
+.DS_Store
+.idea/
+.vscode/
