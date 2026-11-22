@@ -171,7 +171,9 @@ try {
     $openApiResponse = request('GET', '/openapi.json');
     $openApi = json_decode($openApiResponse['body'], true);
     check($openApiResponse['status'] === 200 && is_array($openApi) && ($openApi['openapi'] ?? null) === '3.0.3', 'OpenAPI document is served as valid JSON');
+    check(($openApi['servers'][0]['url'] ?? null) === $baseUrl, 'OpenAPI server URL matches the current request host');
     check(request('GET', '/docs')['status'] === 200 && strpos(request('GET', '/docs')['body'], 'SwaggerUIBundle') !== false, 'Swagger UI page is served');
+    check(request('GET', '/docs/swagger.php')['status'] === 200, 'Swagger UI document endpoint is served');
     $preflight = request('OPTIONS', '/api/v1/restaurants');
     check(
         $preflight['status'] === 204
@@ -259,6 +261,20 @@ try {
     check(request('PUT', '/api/v1/order-items/' . $orderItemId, jsonBody(['quantity' => 3]))['status'] === 200, 'Order item update returns 200');
     check(request('PUT', '/api/v1/order-items/' . $orderItemId, jsonBody(['quantity' => 0]))['status'] === 400, 'Order item rejects a non-positive quantity');
 
+    check(request('POST', '/api/v1/reviews', jsonBody([
+        'user_id' => $userId,
+        'restaurant_id' => $restaurantId,
+        'rating' => 5,
+    ]))['status'] === 400, 'Review requires a delivered order from the restaurant');
+    check(request('PUT', '/api/v1/orders/' . $orderId, jsonBody(['status' => 'out_for_delivery']))['status'] === 200, 'Order can transition to out for delivery');
+    check(request('PUT', '/api/v1/orders/' . $orderId, jsonBody(['status' => 'delivered']))['status'] === 200, 'Order can transition to delivered');
+    check(request('POST', '/api/v1/reviews', jsonBody([
+        'user_id' => $userId,
+        'restaurant_id' => $restaurantId,
+        'rating' => 5,
+        'comment' => '<b>HTML is not allowed</b>',
+    ]))['status'] === 400, 'Review rejects HTML markup');
+
     $reviewResponse = request('POST', '/api/v1/reviews', jsonBody([
         'user_id' => $userId,
         'restaurant_id' => $restaurantId,
@@ -271,6 +287,7 @@ try {
     check(request('GET', '/api/v1/reviews/' . $reviewId)['status'] === 200, 'Review read returns 200');
     check(request('PUT', '/api/v1/reviews/' . $reviewId, jsonBody(['rating' => 4]))['status'] === 200, 'Review update returns 200');
     check(request('PUT', '/api/v1/reviews/' . $reviewId, jsonBody(['rating' => 6]))['status'] === 400, 'Review rejects a rating outside 1–5');
+    check(request('PUT', '/api/v1/reviews/' . $reviewId, jsonBody(['comment' => '<script>alert(1)</script>']))['status'] === 400, 'Review update rejects HTML markup');
     check(request('POST', '/api/v1/reviews', jsonBody([
         'user_id' => $userId,
         'restaurant_id' => $restaurantId,
@@ -281,6 +298,24 @@ try {
     check(request('POST', '/api/v1/restaurants', jsonBody(['name' => 'Missing address']))['status'] === 400, 'Missing required data returns 400');
     check(request('POST', '/api/v1/restaurants', jsonBody(['name' => 'Unexpected', 'address' => 'Sarajevo', 'id' => 9]))['status'] === 400, 'Unsupported fields return 400');
     check(request('GET', '/api/v1/restaurants/0')['status'] === 400, 'Invalid record IDs return 400');
+    $nonNumericId = request('GET', '/api/v1/restaurants/not-a-number');
+    check($nonNumericId['status'] === 404 && is_array(json_decode($nonNumericId['body'], true)), 'Nonnumeric record IDs use the global JSON 404 handler');
+    $unknownEndpoint = request('GET', '/api/v1/not-a-resource');
+    check($unknownEndpoint['status'] === 404 && is_array(json_decode($unknownEndpoint['body'], true)), 'Unknown endpoints use the global JSON 404 handler');
+    $unsupportedMethod = request('PATCH', '/api/v1/restaurants');
+    $allowHeaders = array_values(array_filter(
+        $unsupportedMethod['headers'],
+        static function (string $header): bool {
+            return stripos($header, 'Allow:') === 0;
+        }
+    ));
+    check(
+        $unsupportedMethod['status'] === 405
+            && is_array(json_decode($unsupportedMethod['body'], true))
+            && count($allowHeaders) === 1
+            && (strpos($allowHeaders[0], 'GET') !== false || strpos($allowHeaders[0], 'POST') !== false),
+        'Unsupported methods return a JSON 405 with the allowed methods'
+    );
     check(request('GET', '/api/v1/restaurants/999999')['status'] === 404, 'Missing records return 404');
     check(request('GET', '/api/v1/restaurants/' . PHP_INT_MAX . '0')['status'] === 400, 'Overflowing record IDs return 400');
 
@@ -332,6 +367,7 @@ try {
         '/api/v1/reviews/{id}' => ['get', 'put', 'delete'],
         '/api/v1/weather/sarajevo' => ['get'],
         '/openapi.json' => ['get'],
+        '/docs/swagger.php' => ['get'],
         '/docs' => ['get'],
     ];
     $coverage = true;

@@ -12,27 +12,27 @@ backend/
   database/     MySQL schema and sample restaurant/menu data
   dao/          PDO data-access objects
   logs/         Ignored runtime info and error logs
-  public/       FlightPHP entry point and Apache rewrite rules
-  routes/       CRUD routes and HTTP request/response helpers
+  public/       FlightPHP entry point, Apache rewrite rules, and OpenAPI/Swagger documentation
+  routes/       Per-entity CRUD routes, error handlers, and HTTP request/response helpers
   services/     Validation, business rules, logging, weather integration
   tests/        Isolated SQLite-backed HTTP integration checks
-  openapi.json  OpenAPI 3.0 API definition
 docs/
   AI_LOG.md     AI-use notes by milestone
   ERD.md        Entity relationships
 frontend/
   css/          Responsive application styles
-  js/           SPA interactions and frontend service modules
+  js/           SPA fragment loader, interactions, and frontend service modules
   tests/        Frontend weather-service checks
-  index.html    SPA shell and screen templates
-composer.json   FlightPHP dependency and class autoloading
+  views/        Separately loaded SPA page fragments
+  index.html    SPA shell with hash/history navigation
+composer.json   FlightPHP and swagger-php dependencies and class autoloading
 ```
 
 ## Entities and relationships
 
 The MySQL schema contains **Users, Restaurants, MenuItems, Orders, OrderItems, and Reviews**. A user can place many orders and write reviews; a restaurant owns menu items and receives orders and reviews; each order contains order items that refer to menu items. `OrderItems` records purchase-time quantity and price. See the [ERD](docs/ERD.md) and [schema export](backend/database/easybites.sql).
 
-Each entity has a DAO inheriting prepared-statement CRUD operations from `BaseDAO`. Its service validates application input, checks related records, and is the only layer that calls DAOs. FlightPHP routes handle JSON and HTTP status codes.
+Each entity has a DAO inheriting prepared-statement CRUD operations from `BaseDAO`. Its service validates application input, checks related records, and is the only layer that calls DAOs. FlightPHP routes handle JSON and HTTP status codes. Review creation requires a delivered order from that restaurant, rejects HTML markup, and prevents duplicate reviews at the service layer as well as through the database constraint.
 
 ## Roles and test accounts
 
@@ -44,7 +44,7 @@ The Discover page displays current Sarajevo weather and a practical weather-awar
 
 ## Run locally
 
-Install PHP 7.4 or newer with PDO MySQL and SQLite extensions, MySQL 8.0.16 or newer (the schema uses enforced `CHECK` constraints) or the XAMPP MariaDB version verified for M2, and Composer.
+Install PHP 8.2 or newer with PDO MySQL and SQLite extensions, MySQL 8.0.16 or newer (the schema uses enforced `CHECK` constraints) or the XAMPP MariaDB version verified for M2, and Composer.
 
 1. Install the PHP dependency:
 
@@ -93,7 +93,7 @@ The backend is not configured for production hosting. Its current CRUD endpoints
 
 ## API documentation
 
-After starting the backend, open the interactive Swagger UI at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). The OpenAPI JSON is at [http://127.0.0.1:8000/openapi.json](http://127.0.0.1:8000/openapi.json). The Swagger assets load from a pinned CDN and therefore require an internet connection.
+After starting the backend, open the interactive Swagger UI at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). The OpenAPI JSON is generated from PHP 8.2 attributes and is available at [http://127.0.0.1:8000/openapi.json](http://127.0.0.1:8000/openapi.json) or `/docs/swagger.php`; its server URL follows the request host and base path. The Swagger UI assets load from a pinned CDN and require an internet connection.
 
 CRUD endpoints are available under `/api/v1/` for `users`, `restaurants`, `menu-items`, `orders`, `order-items`, and `reviews`, with collection and record routes. The weather endpoint is `/api/v1/weather/sarajevo`. M3 does not implement authentication, so `401`/`403` authorization responses are not yet applicable.
 

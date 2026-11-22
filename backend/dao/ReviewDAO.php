@@ -15,4 +15,21 @@ final class ReviewDAO extends BaseDAO
             'comment',
         ]);
     }
+
+    public function existsForUserAndRestaurant(int $userId, int $restaurantId, ?int $exceptReviewId = null): bool
+    {
+        $sql = 'SELECT 1 FROM reviews WHERE user_id = :user_id AND restaurant_id = :restaurant_id';
+        $parameters = [
+            'user_id' => $userId,
+            'restaurant_id' => $restaurantId,
+        ];
+        if ($exceptReviewId !== null) {
+            $sql .= ' AND id <> :except_review_id';
+            $parameters['except_review_id'] = $exceptReviewId;
+        }
+        $statement = $this->pdo->prepare($sql . ' LIMIT 1');
+        $statement->execute($parameters);
+
+        return $statement->fetchColumn() !== false;
+    }
 }

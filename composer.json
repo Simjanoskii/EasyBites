@@ -1,7 +1,8 @@
 {
     "require": {
+        "php": ">=8.2",
         "flightphp/core": "^3.19",
-        "php": ">=7.4"
+        "zircote/swagger-php": "^6.12"
     },
     "autoload": {
         "classmap": [

@@ -125,6 +125,8 @@ h1, h2, h3, p { margin-top: 0; }
 .empty-state h3 { margin: 9px 0 5px; font: 700 16px var(--font-display); }
 .empty-state p { margin: 0; color: var(--muted); font-size: 12px; }
 .hidden { display: none !important; }
+.page-loading, .page-load-error { max-width: 720px; margin: 48px auto; padding: 24px; text-align: center; }
+.page-load-error { border: 1px solid var(--line); border-radius: 12px; background: #fff; }
 .local-banner { min-height: 145px; display: flex; align-items: center; gap: 17px; position: relative; overflow: hidden; margin: 16px 0 54px; padding: 25px 30px; border-radius: 12px; background: #eaf0e2; }
 .weather-panel { display: grid; grid-template-columns: minmax(190px, .75fr) 1.2fr .95fr; align-items: center; gap: 13px 22px; margin: 3px 0 26px; padding: 19px 22px; border: 1px solid #dfe7d5; border-radius: 11px; background: #edf2e6; }
 .weather-heading { display: flex; align-items: center; gap: 12px; }
