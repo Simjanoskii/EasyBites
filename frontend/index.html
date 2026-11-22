@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f8f7f3">
     <meta name="description" content="Discover Sarajevo's local restaurants and order your favourites with EasyBites.">
+    <meta name="easybites-api-base-url" content="http://127.0.0.1:8000/api/v1">
     <title>EasyBites — Sarajevo, served.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/services/weather-service.js" defer></script>
     <script src="js/app.js" defer></script>
   </head>
   <body>
@@ -19,7 +21,7 @@
           <span class="brand-mark" aria-hidden="true">e</span>
           <span>easy<span class="brand-accent">bites</span></span>
         </a>
-        <button class="mobile-menu-button" id="menu-toggle" aria-label="Open navigation" aria-expanded="false">
+        <button class="mobile-menu-button" id="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="main-nav">
           <span></span><span></span><span></span>
         </button>
         <nav class="main-nav" id="main-nav" aria-label="Main navigation">
@@ -67,6 +69,28 @@
           </div>
 
           <div class="content-wrap">
+            <section class="weather-panel" aria-labelledby="weather-title">
+              <div class="weather-heading">
+                <span class="weather-icon" aria-hidden="true">☼</span>
+                <div><span class="section-kicker">A FORECAST FOR YOUR FOOD MOOD</span><h2 id="weather-title">Sarajevo, right now</h2></div>
+              </div>
+              <p class="weather-status" id="weather-status" role="status" aria-live="polite">Checking the latest conditions…</p>
+              <div class="weather-content hidden" id="weather-content">
+                <div class="weather-current"><span id="weather-condition">Current conditions</span><strong id="weather-temperature"></strong></div>
+                <div class="weather-facts">
+                  <span>Feels like <strong id="weather-feels-like"></strong></span>
+                  <span>Rain <strong id="weather-rain"></strong></span>
+                  <span>Wind <strong id="weather-wind"></strong></span>
+                </div>
+                <div class="weather-tip"><span>THE LOCAL PICK</span><p id="weather-dining-tip"></p></div>
+                <p class="weather-attribution">Current weather from <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a></p>
+              </div>
+              <div class="weather-error hidden" id="weather-error" role="alert">
+                <p id="weather-error-message">Weather details are unavailable right now. Restaurant discovery still works as usual.</p>
+                <button class="weather-retry" id="weather-retry" type="button">Try again</button>
+              </div>
+            </section>
+
             <section class="category-section" aria-labelledby="category-title">
               <div class="section-heading compact-heading">
                 <div><span class="section-kicker">WHAT ARE YOU CRAVING?</span><h2 id="category-title">Pick your mood</h2></div>

@@ -20,6 +20,40 @@ const restaurantGrid = document.querySelector("#restaurant-grid");
 const cartCount = document.querySelector("#cart-count");
 const toast = document.querySelector("#toast");
 
+function showWeatherError() {
+  document.querySelector("#weather-status").textContent = "";
+  document.querySelector("#weather-content").classList.add("hidden");
+  document.querySelector("#weather-error").classList.remove("hidden");
+}
+
+async function loadWeather() {
+  const status = document.querySelector("#weather-status");
+  const content = document.querySelector("#weather-content");
+  const error = document.querySelector("#weather-error");
+  const retry = document.querySelector("#weather-retry");
+
+  status.textContent = "Checking the latest conditions…";
+  content.classList.add("hidden");
+  error.classList.add("hidden");
+  retry.disabled = true;
+
+  try {
+    const weather = await window.EasyBitesWeatherService.getSarajevoWeather();
+    document.querySelector("#weather-condition").textContent = weather.current.condition;
+    document.querySelector("#weather-temperature").textContent = `${weather.current.temperature_c}°C`;
+    document.querySelector("#weather-feels-like").textContent = `${weather.current.feels_like_c}°C`;
+    document.querySelector("#weather-rain").textContent = `${weather.current.precipitation_mm} mm`;
+    document.querySelector("#weather-wind").textContent = `${weather.current.wind_speed_kmh} km/h`;
+    document.querySelector("#weather-dining-tip").textContent = weather.dining_tip;
+    status.textContent = `Current conditions in ${weather.location.name}.`;
+    content.classList.remove("hidden");
+  } catch {
+    showWeatherError();
+  } finally {
+    retry.disabled = false;
+  }
+}
+
 function formatPrice(price) {
   return `KM ${price.toFixed(2)}`;
 }
@@ -41,17 +75,19 @@ function renderRestaurants() {
   restaurantGrid.innerHTML = visibleRestaurants.map((restaurant) => {
     const isFavorite = favoriteRestaurantIds.has(restaurant.id);
     return `
-      <article class="restaurant-card" data-restaurant="${restaurant.id}" tabindex="0" aria-label="View ${restaurant.name} menu">
-        <div class="restaurant-image image-${restaurant.art}">
-          <span class="restaurant-badge">${restaurant.badge}</span>
-          <button class="favorite-button${isFavorite ? " is-favorite" : ""}" type="button" data-favorite="${restaurant.id}" aria-label="${isFavorite ? "Remove" : "Save"} ${restaurant.name} ${isFavorite ? "from" : "to"} favourites" aria-pressed="${isFavorite}">${isFavorite ? "♥" : "♡"}</button>
-          <span class="food-emoji" aria-hidden="true">${restaurant.emoji}</span>
-        </div>
-        <div class="restaurant-info">
-          <div class="restaurant-title-line"><h3>${restaurant.name}</h3><span class="rating"><span>★</span>${restaurant.rating}</span></div>
-          <p class="restaurant-cuisine">${restaurant.cuisine}</p>
-          <div class="restaurant-meta"><span>${restaurant.time}</span><span>${restaurant.fee} delivery</span></div>
-        </div>
+      <article class="restaurant-card">
+        <a class="restaurant-card-link" href="#restaurant" data-restaurant="${restaurant.id}" aria-label="View ${restaurant.name} menu">
+          <div class="restaurant-image image-${restaurant.art}">
+            <span class="restaurant-badge">${restaurant.badge}</span>
+            <span class="food-emoji" aria-hidden="true">${restaurant.emoji}</span>
+          </div>
+          <div class="restaurant-info">
+            <div class="restaurant-title-line"><h3>${restaurant.name}</h3><span class="rating"><span>★</span>${restaurant.rating}</span></div>
+            <p class="restaurant-cuisine">${restaurant.cuisine}</p>
+            <div class="restaurant-meta"><span>${restaurant.time}</span><span>${restaurant.fee} delivery</span></div>
+          </div>
+        </a>
+        <button class="favorite-button${isFavorite ? " is-favorite" : ""}" type="button" data-favorite="${restaurant.id}" aria-label="${isFavorite ? "Remove" : "Save"} ${restaurant.name} ${isFavorite ? "from" : "to"} favourites" aria-pressed="${isFavorite}">${isFavorite ? "♥" : "♡"}</button>
       </article>`;
   }).join("");
   document.querySelector("#empty-restaurants").classList.toggle("hidden", visibleRestaurants.length > 0);
@@ -70,20 +106,22 @@ function addToCart(restaurant, menuItem) {
   showToast(`${menuItem.name} added to your basket`);
 }
 
-function openRestaurant(restaurantId) {
+function openRestaurant(restaurantId, pushHistory = true) {
   selectedRestaurant = restaurants.find((restaurant) => restaurant.id === Number(restaurantId));
   if (!selectedRestaurant) return;
   const detail = document.querySelector("#restaurant-detail");
   detail.innerHTML = `
     <div class="restaurant-detail-heading">
       <div class="restaurant-detail-art image-${selectedRestaurant.art}">${selectedRestaurant.emoji}</div>
-      <div><span class="section-kicker">${selectedRestaurant.badge}</span><h1 id="restaurant-detail-title">${selectedRestaurant.name}</h1><p>${selectedRestaurant.cuisine}</p><div class="detail-meta"><span>★ ${selectedRestaurant.rating}</span><span>${selectedRestaurant.time}</span><span>${selectedRestaurant.fee} delivery</span></div></div>
+      <div><span class="section-kicker">${selectedRestaurant.badge}</span><h1 id="restaurant-detail-title" tabindex="-1">${selectedRestaurant.name}</h1><p>${selectedRestaurant.cuisine}</p><div class="detail-meta"><span>★ ${selectedRestaurant.rating}</span><span>${selectedRestaurant.time}</span><span>${selectedRestaurant.fee} delivery</span></div></div>
     </div>
     <p class="demo-note">Sample menu for the static project preview.</p>
     <h2 class="menu-title">A little something for you</h2>
     <div class="menu-list">${selectedRestaurant.menu.map((item, index) => `
       <article class="menu-item"><div class="menu-item-copy"><h3>${item.name}</h3><p>${item.description}</p></div><span class="menu-item-price">${formatPrice(item.price)}</span><button class="add-button" type="button" data-add-item="${index}" aria-label="Add ${item.name} to basket">+</button></article>`).join("")}</div>`;
   navigate("restaurant");
+  document.querySelector("#restaurant-detail-title").focus({ preventScroll: true });
+  if (pushHistory) window.history.pushState({ page: "restaurant" }, "", "#restaurant");
 }
 
 function renderCart() {
@@ -113,7 +151,8 @@ function navigate(page) {
   document.querySelector("#main-nav").classList.remove("is-open");
   document.querySelector("#menu-toggle").setAttribute("aria-expanded", "false");
   document.querySelector("#menu-toggle").setAttribute("aria-label", "Open navigation");
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  window.scrollTo({ top: 0, behavior });
 }
 
 function setAuthMode(mode) {
@@ -219,10 +258,10 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const card = target.closest("[data-restaurant]");
-  if (card) {
-    openRestaurant(card.getAttribute("data-restaurant"));
-    window.history.pushState({ page: "restaurant" }, "", "#restaurant");
+  const restaurantLink = target.closest("a[data-restaurant]");
+  if (restaurantLink) {
+    event.preventDefault();
+    openRestaurant(restaurantLink.getAttribute("data-restaurant"));
     return;
   }
 
@@ -266,13 +305,6 @@ document.addEventListener("keydown", (event) => {
   selectAdminView(tabs[nextIndex].getAttribute("data-admin-view"), true);
 });
 
-document.querySelector("#restaurant-grid").addEventListener("keydown", (event) => {
-  if ((event.key === "Enter" || event.key === " ") && event.target instanceof Element) {
-    const card = event.target.closest("[data-restaurant]");
-    if (card && !event.target.closest("button")) openRestaurant(card.getAttribute("data-restaurant"));
-  }
-});
-
 document.querySelector("#categories").addEventListener("click", (event) => {
   if (!(event.target instanceof Element)) return;
   const chip = event.target.closest("[data-category]");
@@ -298,6 +330,10 @@ document.querySelector("#menu-toggle").addEventListener("click", (event) => {
   button.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
 });
 
+document.querySelector(".location-button").addEventListener("click", () => {
+  showToast("Delivery is currently set to Sarajevo");
+});
+
 document.querySelectorAll("[data-auth-mode]").forEach((button) => button.addEventListener("click", () => setAuthMode(button.dataset.authMode)));
 
 document.querySelector("#auth-form").addEventListener("submit", (event) => {
@@ -305,8 +341,11 @@ document.querySelector("#auth-form").addEventListener("submit", (event) => {
   showToast(authMode === "login" ? "Sign-in will be available in a future milestone" : "Account creation will be available in a future milestone");
 });
 
+document.querySelector("#weather-retry").addEventListener("click", loadWeather);
+
 document.querySelectorAll('a[href^="#"]').forEach((link) => {
   link.addEventListener("click", (event) => {
+    if (link.matches("a[data-restaurant]")) return;
     const page = link.getAttribute("href")?.slice(1);
     if (!page || !pageNames.includes(page)) return;
     event.preventDefault();
@@ -318,4 +357,7 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
 window.addEventListener("popstate", () => navigate(window.location.hash.slice(1)));
 
 renderRestaurants();
-if (pageNames.includes(window.location.hash.slice(1))) navigate(window.location.hash.slice(1));
+loadWeather();
+const initialPage = window.location.hash.slice(1);
+if (initialPage === "restaurant") openRestaurant(selectedRestaurant.id, false);
+else if (pageNames.includes(initialPage)) navigate(initialPage);

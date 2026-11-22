@@ -1,0 +1,17 @@
+{
+    "require": {
+        "flightphp/core": "^3.19",
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "classmap": [
+            "backend/config/",
+            "backend/dao/",
+            "backend/routes/",
+            "backend/services/"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
