@@ -320,7 +320,8 @@ document.querySelector("#search-form").addEventListener("submit", (event) => {
   selectedCategory = "All";
   document.querySelectorAll(".category-chip").forEach((chip) => chip.classList.toggle("selected", chip.dataset.category === "All"));
   renderRestaurants();
-  document.querySelector("#restaurant-title").scrollIntoView({ behavior: "smooth", block: "center" });
+  const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  document.querySelector("#restaurant-title").scrollIntoView({ behavior, block: "center" });
 });
 
 document.querySelector("#menu-toggle").addEventListener("click", (event) => {
