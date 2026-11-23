@@ -1,62 +1,64 @@
 # EasyBites
 
-EasyBites is a local food-delivery platform for Sarajevo, Bosnia and Herzegovina. It is designed to help people discover and order from the city's restaurants and fast-food spots in one place.
+EasyBites is a local food-delivery project for Sarajevo, Bosnia and Herzegovina. It helps people discover the city's neighbourhood restaurants and, eventually, order from them.
 
-> **Milestone 2 status:** The repository contains the responsive static SPA preview, a six-entity MySQL schema with sample restaurant/menu data, and PDO DAO classes with reusable prepared-statement CRUD operations. The browser still uses demonstration data: REST routes, authentication, Swagger UI, external API integration, and public deployment are later milestones.
+> **Milestone 3 status:** The backend has validated services and FlightPHP CRUD endpoints for all six database entities, an OpenAPI 3 specification with a Swagger UI page, and a Sarajevo weather/dining suggestion feature backed by Open-Meteo. The Discover page consumes the weather endpoint. Other restaurant, menu, basket, order, profile, sign-in, and admin screens remain static demonstrations and do not persist data.
 
 ## Project structure
 
 ```text
 backend/
-  config/       Configuration template and local secrets (not committed)
-  database/     Reproducible MySQL schema and sample data
-  dao/          PHP PDO data-access objects
-  logs/         Runtime info and error logs (not committed)
-  middleware/   Reusable FlightPHP middleware
-  routes/       FlightPHP REST API routes
-  services/     Backend business logic and integrations
+  config/       Safe config template and ignored local config
+  database/     MySQL schema and sample restaurant/menu data
+  dao/          PDO data-access objects
+  logs/         Ignored runtime info and error logs
+  public/       FlightPHP entry point, Apache rewrite rules, and OpenAPI/Swagger documentation
+  routes/       Per-entity CRUD routes, error handlers, and HTTP request/response helpers
+  services/     Validation, business rules, logging, weather integration
+  tests/        Isolated SQLite-backed HTTP integration checks
 docs/
-  AI_LOG.md     AI usage and review notes by milestone
-  ERD.md        Entity-relationship diagram for the current schema
-.github/
-  agents/       Frontend, Backend, and read-only Reviewer agents
-.agents/
-  skills/       Reusable update-ai-log workflow
+  AI_LOG.md     AI-use notes by milestone
+  ERD.md        Entity relationships
 frontend/
   css/          Responsive application styles
-  js/           SPA navigation and demo interactions
-  static/       Static assets (directory ready for project assets)
-  views/        Reserved for extracted HTML templates
-  index.html    SPA entry point and current page templates
+  js/           SPA fragment loader, interactions, and frontend service modules
+  tests/        Frontend weather-service checks
+  views/        Separately loaded SPA page fragments
+  index.html    SPA shell with hash/history navigation
+composer.json   FlightPHP and swagger-php dependencies and class autoloading
 ```
 
 ## Entities and relationships
 
-The database contains **Users, Restaurants, MenuItems, Orders, OrderItems, and Reviews**. A user can place many orders and write reviews; each restaurant owns menu items and receives reviews; each order contains order items that refer to menu items. Order items preserve the purchase-time price. See the [schema ERD](docs/ERD.md) and [MySQL export](backend/database/easybites.sql).
+The MySQL schema contains **Users, Restaurants, MenuItems, Orders, OrderItems, and Reviews**. A user can place many orders and write reviews; a restaurant owns menu items and receives orders and reviews; each order contains order items that refer to menu items. `OrderItems` records purchase-time quantity and price. See the [ERD](docs/ERD.md) and [schema export](backend/database/easybites.sql).
 
-The `BaseDAO` provides `create`, `findById`, `findAll`, `update`, and `delete` methods using PDO prepared statements. `UserDAO`, `RestaurantDAO`, `MenuItemDAO`, `OrderDAO`, `OrderItemDAO`, and `ReviewDAO` each supply their table and writable-column allowlist.
+Each entity has a DAO inheriting prepared-statement CRUD operations from `BaseDAO`. Its service validates application input, checks related records, and is the only layer that calls DAOs. FlightPHP routes handle JSON and HTTP status codes. Review creation requires a delivered order from that restaurant, rejects HTML markup, and prevents duplicate reviews at the service layer as well as through the database constraint.
 
 ## Roles and test accounts
 
-The planned roles are **customer** and **admin**. The customer preview includes discovery, restaurant menus, basket, order tracking, profile, sign-in, and registration screens. The admin preview includes dashboard, restaurant and menu-item catalogues, order management, user roles, and review moderation. There are no working test credentials yet; users are not seeded in the SQL export, and the role preview and management controls remain static.
+The schema defines **customer** and **admin** roles. M3 customer creation hashes passwords server-side; password hashes are omitted from API responses, and the M3 API does not accept role changes. There are no seeded or working login accounts yet. Authentication, JWTs, and role authorization belong to Milestone 4; the API is currently unauthenticated and is for local development only. **Do not expose it to the internet.**
 
 ## External API
 
-An external API has not been integrated yet. The provider and user-facing feature will be documented here in the milestone that implements it.
+The Discover page displays current Sarajevo weather and a practical weather-aware dining tip using the free, no-key [Open-Meteo API](https://open-meteo.com/). The backend endpoint is `GET /api/v1/weather/sarajevo`; it validates the upstream response, has a five-second timeout, logs success/failure, and returns a user-friendly `503` during provider outages. The frontend shows loading and retry/fallback states so restaurant discovery remains usable if weather is unavailable. The UI credits Open-Meteo.
 
 ## Run locally
 
-The frontend preview can still be opened without starting a backend. To create the Milestone 2 database and prepare local PDO configuration:
+Install PHP 8.2 or newer with PDO MySQL and SQLite extensions, MySQL 8.0.16 or newer (the schema uses enforced `CHECK` constraints) or the XAMPP MariaDB version verified for M2, and Composer.
 
-1. Install PHP 7.4 or newer with the PDO MySQL extension, and MySQL 8.0.16 or newer (the schema uses enforced `CHECK` constraints). The schema was also verified with XAMPP's MariaDB 10.4.28.
-2. Clone the repository and import the SQL file from the repository root:
+1. Install the PHP dependency:
+
+   ```sh
+   composer install
+   ```
+
+2. Import the schema and sample data from the repository root:
 
    ```sh
    mysql -u root -p < backend/database/easybites.sql
    ```
 
-   The script creates and selects the `easybites` database, its tables, and sample restaurants/menu items. For a restricted local MySQL account, grant that account access to this database.
-3. Create a dedicated local database account with CRUD-only permissions. Replace the example password with a strong local password:
+3. Create a local database account with CRUD-only permissions (replace the example password with a strong local password):
 
    ```sql
    CREATE USER 'easybites_app'@'127.0.0.1'
@@ -65,30 +67,49 @@ The frontend preview can still be opened without starting a backend. To create t
      TO 'easybites_app'@'127.0.0.1';
    ```
 
-   Run these statements in the local MySQL/MariaDB shell as an administrator. The account is only for connections from this computer; do not enable remote database access for course marking.
-4. Copy the safe configuration template and set the same password:
+4. Copy the safe configuration template and set the matching local database password:
 
    ```sh
    cp backend/config/config.example.php backend/config/config.php
    ```
 
-   Keep `backend/config/config.php` private; it is ignored by Git. The database import is run separately as an administrator, so the app account does not need schema-creation privileges.
-5. Open `frontend/index.html` in a browser, or serve the repository with a local static web server and open the frontend entry point. The current browser screens use mock data and are not connected to these DAOs.
+   `backend/config/config.php` is ignored by Git. Never commit credentials or runtime log files.
 
-No backend API server, service layer, or routes are provided in this milestone, so the DAOs cannot yet be exercised through the SPA.
+5. Start the API server from the repository root:
+
+   ```sh
+   php -S 127.0.0.1:8000 -t backend/public backend/public/index.php
+   ```
+
+6. In another terminal, serve the SPA:
+
+   ```sh
+   php -S 127.0.0.1:5500 -t frontend
+   ```
+
+   Open `http://127.0.0.1:5500`. The weather service base URL is in the `easybites-api-base-url` meta tag in `frontend/index.html`. The API allows local frontend origins on ports 5500 and 8080.
+
+The backend is not configured for production hosting. Its current CRUD endpoints have no authentication or authorization, and the frontend entity screens are not connected to them. Do not use this M3 state for public deployment or real customer data.
 
 ## API documentation
 
-The FlightPHP REST API and its OpenAPI/Swagger documentation are not implemented yet. The Swagger documentation link will be added here when available.
+After starting the backend, open the interactive Swagger UI at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). The OpenAPI JSON is generated from PHP 8.2 attributes and is available at [http://127.0.0.1:8000/openapi.json](http://127.0.0.1:8000/openapi.json) or `/docs/swagger.php`; its server URL follows the request host and base path. The Swagger UI assets load from a pinned CDN and require an internet connection.
 
-## Deployment
+CRUD endpoints are available under `/api/v1/` for `users`, `restaurants`, `menu-items`, `orders`, `order-items`, and `reviews`, with collection and record routes. The weather endpoint is `/api/v1/weather/sarajevo`. M3 does not implement authentication, so `401`/`403` authorization responses are not yet applicable.
 
-EasyBites is not publicly deployed yet. The public application link will be added here after hosting is configured.
+## Verification
 
-## AI usage
+Run the isolated CRUD, validation, HTTP status, failure handling, OpenAPI-reference, and weather-stub integration checks:
 
-See [AGENTS.md](AGENTS.md) for project-specific coding guidance, [.github/agents/](.github/agents/) for the scoped Frontend/Backend/Reviewer agents, [.agents/skills/update-ai-log/SKILL.md](.agents/skills/update-ai-log/SKILL.md) for the reusable AI-log workflow, and [docs/AI_LOG.md](docs/AI_LOG.md) for AI usage notes by milestone.
+```sh
+php backend/tests/run.php
+node --test frontend/tests/weather-service.test.js
+```
 
-## Course submission
+The backend integration suite uses a temporary SQLite database; it does not replace testing against the project's MySQL/XAMPP configuration.
 
-Submit the project topic and this GitHub repository URL through the course/LMS form. This repository setup does not submit the form on your behalf.
+## Deployment and course submission
+
+EasyBites is not deployed; no live URL or working test login exists. Pushes, pull requests, reviewer requests, merges, and LMS submissions are external steps and have not been performed by this repository setup.
+
+See [AGENTS.md](AGENTS.md) for project-specific implementation rules, [docs/AI_LOG.md](docs/AI_LOG.md) for milestone AI-use notes, and [.agents/skills/update-ai-log/SKILL.md](.agents/skills/update-ai-log/SKILL.md) for the AI-log workflow.
